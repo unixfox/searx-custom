@@ -1,0 +1,89 @@
+From 42459011e14d4993f84df710e2800d6f8bbec0ac Mon Sep 17 00:00:00 2001
+From: Emilien Devos <4016501+unixfox@users.noreply.github.com>
+Date: Mon, 26 Jun 2023 00:35:46 +0200
+Subject: [PATCH 1/1] oscar patching
+
+---
+ searx/preferences.py                          |  5 +++
+ searx/settings_defaults.py                    |  2 +
+ searx/webapp.py                               | 14 +++++++
+ 5 files changed, 65 insertions(+)
+
+diff --git a/searx/preferences.py b/searx/preferences.py
+index aba712652..9f47a0ddb 100644
+--- a/searx/preferences.py
++++ b/searx/preferences.py
+@@ -420,6 +420,11 @@ class Preferences:
+                 locked=is_locked('doi_resolver'),
+                 choices=DOI_RESOLVERS
+             ),
++            'oscar-style': EnumStringSetting(
++                settings['ui']['theme_args']['oscar_style'],
++                locked=is_locked('oscar-style'),
++                choices=['', 'logicodev', 'logicodev-dark', 'pointhi']
++            ),
+             'simple_style': EnumStringSetting(
+                 settings['ui']['theme_args']['simple_style'],
+                 locked=is_locked('simple_style'),
+diff --git a/searx/settings_defaults.py b/searx/settings_defaults.py
+index 5d978d0e0..1e07497cf 100644
+--- a/searx/settings_defaults.py
++++ b/searx/settings_defaults.py
+@@ -19,6 +19,7 @@ searx_dir = abspath(dirname(__file__))
+ logger = logging.getLogger('searx')
+ OUTPUT_FORMATS = ['html', 'csv', 'json', 'rss']
+ SXNG_LOCALE_TAGS = ['all', 'auto'] + list(l[0] for l in sxng_locales)
++OSCAR_STYLE = ('logicodev', 'logicodev-dark', 'pointhi')
+ SIMPLE_STYLE = ('auto', 'light', 'dark')
+ CATEGORIES_AS_TABS = {
+     'general': {},
+@@ -191,6 +192,7 @@ SCHEMA = {
+         'default_theme': SettingsValue(str, 'simple'),
+         'default_locale': SettingsValue(str, ''),
+         'theme_args': {
++            'oscar_style': SettingsValue(OSCAR_STYLE, 'logicodev'),
+             'simple_style': SettingsValue(SIMPLE_STYLE, 'auto'),
+         },
+         'center_alignment': SettingsValue(bool, False),
+diff --git a/searx/webapp.py b/searx/webapp.py
+index 9793ee534..bdd0755bb 100755
+--- a/searx/webapp.py
++++ b/searx/webapp.py
+@@ -379,6 +379,11 @@ def render(template_name: str, **kwargs):
+         encoding='utf-8',
+     )
+ 
++    kwargs['autocomplete'] = request.preferences.get_value('autocomplete')
++    kwargs['method'] = request.preferences.get_value('method')
++    kwargs['infinite_scroll'] = request.preferences.get_value('infinite_scroll')
++    kwargs['translations'] = json.dumps(get_translations(), separators=(',', ':'))
++
+     # values from the HTTP requests
+     kwargs['endpoint'] = 'results' if 'q' in kwargs else request.endpoint
+     kwargs['cookies'] = request.cookies
+@@ -788,6 +793,11 @@ def search():
+     )
+ 
+ 
++@app.route('/donate', methods=['GET'])
++def donate():
++    """Render donate page"""
++    return render('donate.html')
++
+ @app.route('/about', methods=['GET'])
+ def about():
+     """Redirect to about page"""
+@@ -1119,6 +1129,10 @@ def engine_descriptions():
+ 
+ @app.route('/stats', methods=['GET'])
+ def stats():
++    if not request.form.get('theme'):
++        query = ('?theme=simple&' + request.query_string.decode()) if request.query_string else '?theme=simple'
++        return redirect(url_for('stats') + query, 308)
++
+     """Render engine statistics page."""
+     sort_order = request.args.get('sort', default='name', type=str)
+     selected_engine_name = request.args.get('engine', default=None, type=str)
+-- 
+2.41.0
+

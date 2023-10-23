@@ -1,0 +1,25 @@
+From 1b59cfa0b05774c5aae8a421194566409b2d8387 Mon Sep 17 00:00:00 2001
+From: Emilien Devos <contact@emiliendevos.be>
+Date: Wed, 23 Nov 2022 10:40:49 +0100
+Subject: [PATCH 1/1] force yewtu.be URL
+
+---
+ searx/engines/invidious.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/searx/engines/invidious.py b/searx/engines/invidious.py
+index 29f27663..b1e69aed 100644
+--- a/searx/engines/invidious.py
++++ b/searx/engines/invidious.py
+@@ -58,7 +58,7 @@ def response(resp):
+     results = []
+ 
+     search_results = resp.json()
+-    base_invidious_url = resp.search_params['base_url'] + "/watch?v="
++    base_invidious_url = "https://yewtu.be" + "/watch?v="
+ 
+     for result in search_results:
+         rtype = result.get("type", None)
+-- 
+2.37.0 (Apple Git-136)
+

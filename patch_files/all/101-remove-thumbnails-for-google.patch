@@ -1,0 +1,25 @@
+From 4591a7ff8cc83b1c76479424f1ee5fc421aa6be0 Mon Sep 17 00:00:00 2001
+From: Emilien Devos <contact@emiliendevos.be>
+Date: Mon, 8 May 2023 18:23:43 +0200
+Subject: [PATCH 1/1] remove thumbnails for google
+
+---
+ searx/engines/google.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/searx/engines/google.py b/searx/engines/google.py
+index 708068f3..d7ace220 100644
+--- a/searx/engines/google.py
++++ b/searx/engines/google.py
+@@ -369,7 +369,7 @@ def response(resp):
+             else:
+                 img_src = None
+ 
+-            results.append({'url': url, 'title': title, 'content': content, 'img_src': img_src})
++            results.append({'url': url, 'title': title, 'content': content})
+ 
+         except Exception as e:  # pylint: disable=broad-except
+             logger.error(e, exc_info=True)
+-- 
+2.40.1
+

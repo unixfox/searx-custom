@@ -1,0 +1,25 @@
+From c830bb7fd580fd19ba296b29007360a280fbb452 Mon Sep 17 00:00:00 2001
+From: Emilien Devos <contact@emiliendevos.be>
+Date: Wed, 10 May 2023 12:22:51 +0200
+Subject: [PATCH 1/1] info about simple theme url
+
+---
+ searx/templates/oscar/search_full.html | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/searx/templates/oscar/search_full.html b/searx/templates/oscar/search_full.html
+index d3982304..f6f2b6fd 100644
+--- a/searx/templates/oscar/search_full.html
++++ b/searx/templates/oscar/search_full.html
+@@ -15,5 +15,8 @@
+     <div class="col-md-8 col-md-offset-2  advanced">
+         {% include 'oscar/advanced.html' %}
+     </div>
++    <div class="col-md-8 col-md-offset-2">
++        <h4><a href="https://sp.searx.be">Want a more modern interface?</h4></p>
++    </div>
+ 
+ </form><!-- / #search_form_full -->
+-- 
+2.40.1
+

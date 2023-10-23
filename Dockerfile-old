@@ -1,0 +1,58 @@
+FROM node:16-alpine AS build
+WORKDIR /app
+
+COPY oprah-proxy/package.json .
+RUN npm i
+COPY oprah-proxy/ /app
+RUN npx pkg -t node16-alpine-x64 --output app index.js
+
+FROM woahbase/alpine-python3
+
+ARG PUID=991
+ARG PGID=991
+
+ENV BASE_URL=False IMAGE_PROXY=False
+
+RUN set -xe \
+    && apk add -Uu --no-cache --purge \
+	    ca-certificates \
+	    curl \
+	    libxml2 \
+	    libxslt \
+	    openssl \
+        protobuf \
+        brotli \
+    && apk add --no-cache -t build-dependencies \
+	    build-base \
+	    python3-dev \
+	    libffi-dev \
+	    libxslt-dev \
+	    libxml2-dev \
+	    openssl-dev \
+	    tar \
+        protobuf \
+        protobuf-dev \
+    && pip install -v --no-cache -r https://raw.githubusercontent.com/searxng/searxng/master/requirements.txt \
+    && pip install --no-cache requests \
+    && mkdir /usr/local/searx \
+    && cd /usr/local/searx \
+    && curl -SL https://github.com/searxng/searxng/archive/master.tar.gz | tar xz --strip 1 \
+    && sed -i "s/127.0.0.1/0.0.0.0/g" searx/settings.yml \
+    && apk del --purge build-dependencies \
+    && rm -f /var/cache/apk/* /tmp/*
+
+COPY root/ /
+
+COPY --from=build /app/app /usr/bin/genenatorOprahProxy
+
+#RUN sed -i 's/\/search/:443\/search/g' /usr/local/searx/searx/engines/google.py
+
+RUN sed -i 's/suspended_time=3600/suspended_time=0/g' /usr/local/searx/searx/exceptions.py
+
+COPY patch/ /usr/local/searx/searx/
+
+VOLUME /data
+
+EXPOSE 8888
+
+ENTRYPOINT ["/init"]

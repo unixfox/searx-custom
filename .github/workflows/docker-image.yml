@@ -1,0 +1,78 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+
+  schedule:
+    - cron:  '0 7 * * 1'
+    - cron:  '0 0 1 * *'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+      with:
+        platforms: arm64
+    - name: Check Out Repo
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Check Out Repo searxng for oscar patching
+      uses: actions/checkout@v2
+      with:
+        repository: "searxng/searxng"
+        ref: 'master'
+        path: 'searxng-oscar'
+
+    - name: Update version frozen
+      run: |
+        sed -i "s/replace_version_string/$(date +'%Y.%-m.%d')/" root/searx/version_frozen.py
+
+    - name: patch searxng oscar main repo
+      run: |
+        cd searxng-oscar
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git am ../patch_files/all/*.patch
+        git am ../patch_files/oscar/*.patch
+        rm -Rf .git
+        cp -R ../root/* .
+        sed -i 's/https:\/\/docs.searxng.org\/donate.html/https:\/\/searx.be\/donate?theme=oscar/' searx/settings_defaults.py
+        cp searx/templates/simple/opensearch*.xml searx/templates/oscar
+
+    - name: engines patching
+      run: |
+        cd searxng-oscar
+        #sed -i "s/'https:\/\/'/'http:\/\/'/g" searx/engines/google.py
+        #sed -i "s/https:\/\/www.google.com\/supported_domains/http:\/\/www.google.com\/supported_domains/g" searx/engines/google.py
+        #sed -i "s/'https:\/\//'http:\/\//g" searx/engines/startpage.py
+
+    - name: Set up latest commit id searxng
+      run: echo "commitid=$(git ls-remote https://github.com/searxng/searxng.git | head -n1 | awk '{print $1;}')" >> $GITHUB_ENV
+    
+    - name: Build and push searxng oscar
+      uses: docker/build-push-action@v2
+      with:
+        context: ./searxng-oscar
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm64/v8
+        push: true
+        tags: unixfox/searx-custom:latest, unixfox/searx-custom:build-${{ env.commitid }}

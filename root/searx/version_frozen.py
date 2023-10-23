@@ -1,0 +1,5 @@
+VERSION_STRING = "replace_version_string"
+VERSION_TAG = "1.0.0"
+DOCKER_TAG = "latest"
+GIT_URL = "https://github.com/searxng/searxng"
+GIT_BRANCH = "master"
