@@ -1,0 +1,24 @@
+From 7764dd6f5c6b8eeeea348c8f9f225481c4a38885 Mon Sep 17 00:00:00 2001
+From: Emilien Devos <121870973+edevosc2c@users.noreply.github.com>
+Date: Wed, 14 Feb 2024 17:04:50 +0100
+Subject: [PATCH 1/1] remove percentage
+
+---
+ searx/metrics/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/searx/metrics/__init__.py b/searx/metrics/__init__.py
+index 717b3838d..9ed2cc4e2 100644
+--- a/searx/metrics/__init__.py
++++ b/searx/metrics/__init__.py
+@@ -248,7 +248,7 @@ def get_engines_stats(engine_name_list):
+     # request_count (per engine) is a percentage of the total number of requests
+     total_request_count = counter('search', 'count', 'sent')
+     for stats in list_time:
+-        stats['request_count'] = int(round(stats['request_count'] * 100 / total_request_count, 0))
++        stats['request_count'] = int(stats['request_count'])
+ 
+     return {
+         'time': list_time,
+-- 
+2.34.1

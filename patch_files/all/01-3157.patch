@@ -122,9 +122,10 @@ index 689aefc6457..717b3838d0e 100644
  
          list_time.append(stats)
  
++    # request_count (per engine) is a percentage of the total number of requests
 +    total_request_count = counter('search', 'count', 'sent')
 +    for stats in list_time:
-+        stats['request_count'] = int(stats['request_count']))
++        stats['request_count'] = int(round(stats['request_count'] * 100 / total_request_count, 0))
 +
      return {
          'time': list_time,
