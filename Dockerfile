@@ -22,7 +22,7 @@ RUN set -xe \
        libxslt \
        openssl \
     && sed -i s/fasttext-wheel/fasttext/ requirements.txt \
-    && pip3 install --no-cache -r requirements.txt \
+    && pip3 install --break-system-packages --no-cache -r requirements.txt \
     && apk del --purge build-dependencies \
     && rm -f /var/cache/apk/* /tmp/* \
     && rm -rf /root/.cache \
