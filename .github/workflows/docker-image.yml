@@ -58,8 +58,10 @@ jobs:
     #     sed -i 's/https:\/\/docs.searxng.org\/donate.html/https:\/\/searx.be\/donate?theme=oscar/' searx/settings_defaults.py
     #     cp searx/templates/simple/opensearch*.xml searx/templates/oscar
 
-    - name: engines patching
+    - name: engines patching and version frozen
       run: |
+        sed -i "s/replace_version_string/$(date +'%Y.%-m.%d')/" root/searx/version_frozen.py
+        cp -R root/root/searx/version_frozen.py searxng
         cd searxng
         #sed -i "s/'https:\/\/'/'http:\/\/'/g" searx/engines/google.py
         #sed -i "s/https:\/\/www.google.com\/supported_domains/http:\/\/www.google.com\/supported_domains/g" searx/engines/google.py
