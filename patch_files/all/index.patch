@@ -1,0 +1,12 @@
+diff --git a/searx/templates/simple/index.html b/searx/templates/simple/index.html
+index 5c207bbd9..eb17301b6 100644
+--- a/searx/templates/simple/index.html
++++ b/searx/templates/simple/index.html
+@@ -3,6 +3,7 @@
+ {% block content %}
+ <div class="index">
+     <div class="title"><h1>SearXNG</h1></div>
++    <div><h2><a href="https://gist.github.com/unixfox/ee2df1cb84f00877ac7efaa11c30a06c">Read what to expect for the future of this instance.</a></h2></div>
+     {% include 'simple/simple_search.html' %}
+ </div>
+ {% endblock %}
