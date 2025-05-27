@@ -42,17 +42,12 @@ jobs:
       run: |
         sed -i "s/replace_version_string/$(date +'%Y.%-m.%d')/" root/searx/version_frozen.py
 
-    # - name: patch searxng oscar main repo
-    #   run: |
-    #     cd searxng-oscar
-    #     git config --global user.email "you@example.com"
-    #     git config --global user.name "Your Name"
-    #     git am ../patch_files/all/*.patch
-    #     git am ../patch_files/oscar/*.patch
-    #     rm -Rf .git
-    #     cp -R ../root/* .
-    #     sed -i 's/https:\/\/docs.searxng.org\/donate.html/https:\/\/searx.be\/donate?theme=oscar/' searx/settings_defaults.py
-    #     cp searx/templates/simple/opensearch*.xml searx/templates/oscar
+    - name: patch searxng main repo
+      run: |
+        cd searxng
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git am ../patch_files/all/*.patch
 
     - name: engines patching and version frozen
       run: |
